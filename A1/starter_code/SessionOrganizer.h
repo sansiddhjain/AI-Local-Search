@@ -59,7 +59,9 @@ public:
     /**
      * Organize the papers according to some algorithm.
      */
-    void organizePapers();
+    void initialiseRandom();
+    void initialiseSensible();
+    void hillClimbing();
 
 
     /**

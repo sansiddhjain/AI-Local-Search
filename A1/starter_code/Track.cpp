@@ -1,7 +1,7 @@
-/* 
+/*
  * File:   Track.cpp
  * Author: Kapil Thakkar
- * 
+ *
  */
 
 #include <stdlib.h>
@@ -31,6 +31,12 @@ void Track::setPaper ( int sessionIndex, int paperIndex, int paperId )
         cout << "Index out of bound - Track::setPaper" << endl;
         exit ( 0 );
     }
+}
+
+int Track::getPaper(int t, int k)
+{
+  Session ss = sessions[t];
+  return ss->getPaper(int k);
 }
 
 int Track::getNumberOfSessions ( )

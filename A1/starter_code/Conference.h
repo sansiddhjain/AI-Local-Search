@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   Conference.h
  * Author: Kapil Thakkar
  *
@@ -29,17 +29,17 @@ private:
     int papersInSession;
 public:
     Conference();
-    
+
     /**
      * Constructor for Conference.
-     * 
+     *
      * @param parallelTracks is the number of parallel tracks.
      * @param sessionsInTrack is the number of sessions in a track.
      * @param papersInSession is the number of papers in a session.
      */
     Conference(int parallelTracks, int sessionsInTrack, int papersInSession);
-    
-    
+
+
     /**
      * Initialize the tracks.
      * @param parallelTracks is the number of parallel tracks.
@@ -47,37 +47,41 @@ public:
      * @param papersInSession is the number of papers in a session.
      */
     void initTracks(int parallelTracks, int sessionsInTrack, int papersInSession);
-    
-    
+
+
     /**
      * Gets the number of parallel tracks.
      * @return the number of parallel tracks.
      */
     int getParallelTracks();
-    
-    
+
+
     /**
      * Gets the number of sessions in a track.
      * @return the number of sessions in a track.
      */
     int getSessionsInTrack();
-    
-    
+
+
     /**
      * Gets the number of papers in a session.
      * @return the number of papers in a session.
      */
     int getPapersInSession();
-    
-    
+
+    // Returns paper index given p, t, k
+    int getPaper(int p, int t, int k);
+
+    void swapPapers(int p1, int t1, int k1, int p2, int t2, int k2);
+
     /**
      * Gets the track at the specified index.
      * @param index is the index of the specified track.
      * @return the track
      */
     Track getTrack(int index);
-    
-    
+
+
     /**
      * Sets the paper in the specified slot to the given paper id.
      * @param trackIndex is the track index.
@@ -86,10 +90,9 @@ public:
      * @param paperId is the id of the paper.
      */
     void setPaper(int trackIndex, int sessionIndex, int paperIndex, int paperId);
-    
-    
+
+
     void printConference(char *);
 };
 
 #endif	/* CONFERENCE_H */
-

@@ -25,7 +25,7 @@ SessionOrganizer::SessionOrganizer ( string filename )
     conference = new Conference ( parallelTracks, sessionsInTrack, papersInSession );
 }
 
-void SessionOrganizer::organizePapers ( )
+void SessionOrganizer::initialiseRandom ( )
 {
     int paperCounter = 0;
     for ( int i = 0; i < conference->getSessionsInTrack ( ); i++ )
@@ -41,27 +41,104 @@ void SessionOrganizer::organizePapers ( )
     }
 }
 
-void SessionOrganizer::initialise ( )
+void SessionOrganizer::initialiseSensible ( )
 {
-    int paperCounter = 0;
-    for ( int i = 0; i < conference->getSessionsInTrack ( ); i++ )
-    {
-        for ( int j = 0; j < conference->getParallelTracks ( ); j++ )
-        {
-            for ( int k = 0; k < conference->getPapersInSession ( ); k++ )
-            {
-                conference->setPaper ( j, i, k, paperCounter );
-                paperCounter++;
-            }
-        }
-    }
+
 }
 
-void SessionOrganizer::loop ( )
+void SessionOrganizer::hillClimbing ( )
 {
-    int n = conference->getSessionsInTrack()*conference->getParallelTracks()*conference->getPapersInSession();
+    int t = conference->getSessionsInTrack();
+    int p = conference->getParallelTracks();
+    int k = conference->getPapersInSession();
+    int n = k*p*t;
+
     srand(time(NULL));
-    int paper = rand() % n;
+
+    bool localOptima = false;
+    int loopCounter = 0;
+
+    while (!localOptima)
+    {
+      int p1_p = rand() % p;
+      int p1_t = rand() % t;
+      int p1_k = rand() % k;
+      double score, maxScore = scoreOrganization();
+      int p_opt, t_opt, k_opt;
+      if (loopCounter % 2 == 0)
+      {
+        for (int p2_p = 0; p2_p < p; p2_p++)
+        {
+          if (p2_p != p1_p)
+          {
+            for (int p2_k = 0; p2_k < k; p2_k++)
+            {
+              conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p1_t, p2_k);
+              score = scoreOrganization();
+              conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p1_t, p2_k);
+              if (score > maxScore)
+              {
+                maxScore = score;
+                p_opt = p2_p; t_opt = p1_t; k_opt = p2_k;
+              }
+            }
+          }
+        }
+      }
+      else
+      {
+        for (int p2_t = 0; p2_t < p; p2_t++)
+        {
+          if (p2_t != p1_t)
+          {
+            for (int p2_k = 0; p2_k < k; p2_k++)
+            {
+              conference->swapPapers(p1_p, p1_t, p1_k, p1_p, p2_t, p2_k);
+              score = scoreOrganization();
+              conference->swapPapers(p1_p, p1_t, p1_k, p1_p, p2_t, p2_k);
+              if (score > maxScore)
+              {
+                maxScore = score;
+                p_opt = p1_p; t_opt = p2_t; k_opt = p2_k;
+              }
+            }
+          }
+        }
+      }
+      if (maxScore == scoreOrganization())
+      {
+        for (int p2_p = 0; p2_p < p; p2_p++)
+        {
+          if (p2_p != p1_p)
+          {
+            for (int p2_t = 0; p2_t < t; p2_t++)
+            {
+              if (p2_t != p1_t)
+              {
+                for (int p2_k = 0; p2_k < k; p2_k++)
+                {
+                  conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p2_t, p2_k);
+                  score = scoreOrganization();
+                  conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p2_t, p2_k);
+                  if (score > maxScore)
+                  {
+                    maxScore = score;
+                    p_opt = p2_p; t_opt = p2_t; k_opt = p2_k;
+                  }
+                }
+              }
+            }
+          }
+        }
+        if (maxScore == scoreOrganization())
+          localOptima = true;
+        else
+          conference->swapPapers(p1_p, p1_t, p1_k, p_opt, t_opt, k_opt);
+      }
+      else
+        conference->swapPapers(p1_p, p1_t, p1_k, p_opt, t_opt, k_opt);
+      loopCounter++;
+    }
 }
 
 
