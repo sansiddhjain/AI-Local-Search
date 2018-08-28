@@ -5,7 +5,7 @@
  */
 
 #include <cstdlib>
-#include <time>
+#include <ctime>
 
 #include "SessionOrganizer.h"
 #include "Util.h"

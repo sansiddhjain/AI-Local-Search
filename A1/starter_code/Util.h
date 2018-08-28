@@ -35,46 +35,4 @@ void splitString(string message, string delimiter, string result[], int n) {
     }
 }
 
-double** createRandomMat(int n)
-{
-  srand(time(NULL));
-  double** mat = new double*[n];
-  for ( int i = 0; i < n; ++i )
-    mat[i] = new double[n];
-
-  for (int i = 0; i < n; i++)
-  {
-    for (int j = i; j < n; j++)
-    {
-      if (i == j)
-        mat[i][j] = 0;
-      else
-      {
-        mat[i][j] = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
-        mat[j][i] = mat[i][j];
-      }
-    }
-  }
-  return mat;
-}
-
-void createInputFile(int p, int t, int k, char * filename)
-{
-  ofstream ofile(filename);
-  int n = p*t*k;
-  double ** mat = createRandomMat(n);
-  ofile << 2 << "\n";
-  ofile << k<< "\n";
-  ofile << p << "\n";
-  ofile << t << "\n";
-  ofile << 2 << "\n";
-  for ( int i = 0; i < n; i++ )
-  {
-      for ( int j = 0; j < n; j++ )
-          ofile << mat[i][j] << " ";
-      ofile<<"\n";
-  }
-  ofile.close();
-}
-
 #endif	/* UTIL_H */

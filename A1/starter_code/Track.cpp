@@ -36,7 +36,7 @@ void Track::setPaper ( int sessionIndex, int paperIndex, int paperId )
 int Track::getPaper(int t, int k)
 {
   Session ss = sessions[t];
-  return ss->getPaper(int k);
+  return ss.getPaper(k);
 }
 
 int Track::getNumberOfSessions ( )

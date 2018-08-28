@@ -54,13 +54,13 @@ int Conference::getPapersInSession ( )
 int Conference::getPaper(int p, int t, int k)
 {
   Track tr = tracks[p];
-  return tr->getPaper(int t, int k);
+  return tr.getPaper(t, k);
 }
 
 void Conference::swapPapers(int p1, int t1, int k1, int p2, int t2, int k2)
 {
-  paper1 = getPaper(p1, t1, k1);
-  paper2 = getPaper(p2, t2, k2);
+  int paper1 = getPaper(p1, t1, k1);
+  int paper2 = getPaper(p2, t2, k2);
   setPaper(p1, t1, k1, paper2);
   setPaper(p2, t2, k2, paper1);
 }
