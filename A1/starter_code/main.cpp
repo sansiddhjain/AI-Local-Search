@@ -89,7 +89,7 @@ int main ( int argc, char** argv )
 		// Organize the papers into tracks based on similarity.
 		// organizer->initialiseRandom ( );
 		organizer->initialiseSensible ( );
-		// cout << "yay" << '\n';
+		cout << "yay" << '\n';
 		organizer->hillClimbing ( );
 		organizer->hillClimbing ( );
 		organizer->hillClimbing ( );
