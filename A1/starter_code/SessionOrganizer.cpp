@@ -323,6 +323,14 @@ void SessionOrganizer::initialiseSensible ( )
 					temp_schedule.push_back(add_element);
 				}
 			}
+			else if(temp_schedule.size() > k_conf)
+			{
+				while(temp_schedule.size() > k_conf)
+				{
+					domain.push_back(temp_schedule[temp_schedule.size()-1]);
+					temp_schedule.erase(temp_schedule.end()-1);
+				}
+			}
 			schedule[i][j] = temp_schedule;
 		}
 	}
