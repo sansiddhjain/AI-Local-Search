@@ -10,17 +10,15 @@ using namespace std;
 
 class Paper
 {
-  int sim;
+  double sim;
   int p1;
   int p2;
 
-public:
-	Paper();
-			
-  Paper(int s, int p1, int paper2);
+public:		
+  Paper(double s, int p1, int paper2);
 
   //get similarity
-  int getSimilarity();
+  double getSimilarity();
 
   //get the first paper
   int getFirstPaper();

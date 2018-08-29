@@ -8,19 +8,14 @@ using namespace std;
 
 #include "Paper.h"
 
-Paper::Paper()
-{
-
-}
-
-Paper::Paper(int s, int p1, int paper2)
+Paper::Paper(double s, int p1, int paper2)
 {
 	this->sim = s;
 	this->p1 = p1;
 	this->p2 = paper2;
 }
 
-int Paper::getSimilarity()
+double Paper::getSimilarity()
 {
 	return sim;
 }

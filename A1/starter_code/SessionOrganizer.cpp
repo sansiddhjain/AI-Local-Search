@@ -58,11 +58,28 @@ void SessionOrganizer::initialiseSensible ( )
 		{
 			Paper paper (distanceMatrix[i][j], i, j);
 			p.push_back(paper);
+			// cout<<distanceMatrix[i][j] << " " <<paper.getSimilarity()<<endl;
 		}
+
 	}
 
-	sort(p.begin(), p.end(), [](Paper & one, Paper & two){return one.getSimilarity() < two.getSimilarity();});
+	// for(int i=0; i<p.size(); i++)
+	// {
+	// 	cout<<p[i].getFirstPaper()<<" "<<p[i].getSecondPaper()<<" "<<p[i].getSimilarity()<<endl;
+	// }
 
+	sort(p.begin(), p.end(), [](Paper & one, Paper & two){return one.getSimilarity() > two.getSimilarity();});
+
+	//printing the sorted vector
+	// for(int i=0; i<p.size(); i++)
+	// {
+	// 	cout<<p[i].getFirstPaper()<<" "<<p[i].getSecondPaper()<<" "<<p[i].getSimilarity()<<endl;
+	// }
+
+
+
+	// cout<<"sorted"<<endl;
+	// cout<<p.size()<<endl;
 	//keep track of visited papers: paperID and track number
 	vector< Paper1 > visited_paper;
 
@@ -71,6 +88,13 @@ void SessionOrganizer::initialiseSensible ( )
 
 	for(int i=0; i<p.size(); i++)
 	{
+		//debugging
+		// cout<<i<<" "<<visited_paper.size()<<endl;
+		// cout<<p[i].getFirstPaper()<<" "<<p[i].getSecondPaper()<<" "<<p[i].getSimilarity()<<endl;
+		// cout<<"##"<<endl;
+
+		// if(i>10)
+		// 	break;
 		//insert the paper
 		bool p1 = false;
 		bool p2 = false;
@@ -98,8 +122,17 @@ void SessionOrganizer::initialiseSensible ( )
 		// if(find_if(visited_paper.begin(), visited_paper.end(), p[i].getSecondPaper()) != v.end())
 		//     p2 = true;
 
+		//trying some heuristic
+		// if(i > 30000)
+		// {	
+		// 	p1 = false;
+		// 	p2 = false;
+		// }
 		if(p1 && p2)
+		{
+			// cout<<"continued"<<endl;
 			continue;
+		}
 		else if (!p1 && !p2)
 		{
 			//insert both p1 and p2 in a new track
