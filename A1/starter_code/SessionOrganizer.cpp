@@ -103,17 +103,17 @@ void SessionOrganizer::initialiseSensible ( )
 		Paper1 paper2;
 
 		//checking if the paper have already been visited
-		for(int i=0; i<visited_paper.size(); i++)
+		for(int id=0; id<visited_paper.size(); i++)
 		{
-			if(visited_paper[i].getPaperID() == p[i].getFirstPaper() )
+			if(visited_paper[id].getPaperID() == p[i].getFirstPaper() )
 			{
 				p1 = true;
-				paper1 = visited_paper[i];
+				paper1 = visited_paper[id];
 			}
-			if(visited_paper[i].getPaperID() == p[i].getSecondPaper() )
+			if(visited_paper[id].getPaperID() == p[i].getSecondPaper() )
 			{
 				p2 = true;
-				paper2 = visited_paper[i];
+				paper2 = visited_paper[id];
 			}
 			if(p1 && p2)
 				break;
@@ -125,7 +125,7 @@ void SessionOrganizer::initialiseSensible ( )
 
 		//trying some heuristic
 		// if(i > 30000)
-		// {	
+		// {
 		// 	p1 = false;
 		// 	p2 = false;
 		// }
@@ -172,7 +172,7 @@ void SessionOrganizer::initialiseSensible ( )
 					schedule[min_j][min_k].push_back(p[i].getFirstPaper());
 					schedule[min_j][min_k].push_back(p[i].getSecondPaper());
 					visited_paper.push_back( Paper1( p[i].getFirstPaper(), min_k, min_j ) );
-					visited_paper.push_back( Paper1( p[i].getSecondPaper(), min_k, min_j ) );	
+					visited_paper.push_back( Paper1( p[i].getSecondPaper(), min_k, min_j ) );
 				}
 				else
 				{
@@ -186,7 +186,7 @@ void SessionOrganizer::initialiseSensible ( )
 						{
 							if(schedule[j][k].size()<k_conf)
 							{
-								schedule[j][k].push_back(p[i].getSecondPaper());	
+								schedule[j][k].push_back(p[i].getSecondPaper());
 								visited_paper.push_back( Paper1( p[i].getSecondPaper(), k, j ) );
 								esc1 = true;
 								break;
@@ -336,7 +336,7 @@ void SessionOrganizer::initialiseSensible ( )
 			for(int k=0; k<temp_schedule.size(); k++)
 			{
 				inserted_paper.push_back(temp_schedule[k]);
-				conference->setPaper ( j, i, k, temp_schedule[k] );		
+				conference->setPaper ( j, i, k, temp_schedule[k] );
 			}
 		}
 	}
