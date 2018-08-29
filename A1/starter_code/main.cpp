@@ -67,6 +67,7 @@ void createInputFile(int p, int t, int k, char* filename)
  */
 int main ( int argc, char** argv )
 {
+    time_t startTime = time(NULL);
 		// Parse the input.
 		if ( argc < 3 )
 		{
@@ -91,11 +92,11 @@ int main ( int argc, char** argv )
 		// cout<< "entering initialiseSensible" << '\n';
 		organizer->initialiseSensible ( );
 		cout << "yay" << '\n';
-		organizer->hillClimbing ( );
-		organizer->hillClimbing ( );
-		organizer->hillClimbing ( );
-		organizer->hillClimbing ( );
-		organizer->hillClimbing ( );
+		organizer->hillClimbing (startTime, argv[2]);
+		// organizer->hillClimbing ( );
+		// organizer->hillClimbing ( );
+		// organizer->hillClimbing ( );
+		// organizer->hillClimbing ( );
 
 		organizer->printSessionOrganiser ( argv[2]);
 

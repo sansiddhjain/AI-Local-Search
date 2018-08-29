@@ -61,7 +61,8 @@ public:
      */
     void initialiseRandom();
     void initialiseSensible();
-    void hillClimbing();
+    void hillClimbing (time_t startTime, char* output_filename );
+    void hillClimbing1 (time_t startTime, char* output_filename );
 
 
     /**
