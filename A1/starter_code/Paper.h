@@ -15,6 +15,8 @@ class Paper
   int p2;
 
 public:
+	Paper();
+			
   Paper(int s, int p1, int paper2);
 
   //get similarity

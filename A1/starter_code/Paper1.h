@@ -15,6 +15,8 @@ class Paper1
   int session;
 
 public:
+	Paper1();
+	
   Paper1(int i, int t, int s);
 
   int getPaperID();

@@ -1,4 +1,4 @@
-/*
+	/*
  * File:   SessionOrganizer.cpp
  * Author: Kapil Thakkar
  *
@@ -6,6 +6,7 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <algorithm>
 
 #include "SessionOrganizer.h"
 #include "Util.h"
@@ -48,14 +49,14 @@ void SessionOrganizer::initialiseSensible ( )
 {
 	vector<Paper> p;
 	int t = conference->getSessionsInTrack();
-	int p = conference->getParallelTracks();
+	int par = conference->getParallelTracks();
 	int k = conference->getPapersInSession();
-	int n = k*p*t;
+	int n = k*par*t;
 	for (int i=0; i<n; i++)
 	{
 		for (int j=i+1; j<n; j++)
 		{
-			Paper paper = new Paper(distanceMatrix[i][j], i, j);
+			Paper paper (distanceMatrix[i][j], i, j);
 			p.push_back(paper);
 		}
 	}
@@ -66,7 +67,7 @@ void SessionOrganizer::initialiseSensible ( )
 	vector< Paper1 > visited_paper;
 
 	//making temp data structure for the allotment
-	vector<int> schedule[t][p];
+	vector<int> schedule[t][par];
 
 	for(int i=0; i<p.size(); i++)
 	{
@@ -103,13 +104,13 @@ void SessionOrganizer::initialiseSensible ( )
 		{
 			//insert both p1 and p2 in a new track
 			//search for the element with the lowest size in the matrix
-			int min_size = k-1;
+			int min = k-1;
 			int min_k = 0;
 			int min_j = 0;
 			bool esc = false;
 			for(int j=0; j<t; j++)
 			{
-				for(int k=0; k<p; k++)
+				for(int k=0; k<par; k++)
 				{
 					if(schedule[j][k].size() == 0)
 					{
@@ -122,7 +123,7 @@ void SessionOrganizer::initialiseSensible ( )
 					}
 					else if (schedule[j][k].size() < min)
 					{
-						min = schedule[j][k];
+						min = schedule[j][k].size();
 						min_j = j;
 						min_k = k;
 					}
@@ -142,20 +143,20 @@ void SessionOrganizer::initialiseSensible ( )
 		else if(!p1)
 		{
 			//insert p1
-			if(schedule[p2.getSession()][p2.getTrack()].size() < k)
+			if(schedule[paper2.getSession()][paper2.getTrack()].size() < k)
 			{
-				schedule[p2.getSession()][p2.getTrack()].push_back(p[i].getFirstPaper());
-				visited_paper.push_back( Paper1( p[i].getFirstPaper(), p2.getTrack(), p2.getSession() ) );
+				schedule[paper2.getSession()][paper2.getTrack()].push_back(p[i].getFirstPaper());
+				visited_paper.push_back( Paper1( p[i].getFirstPaper(), paper2.getTrack(), paper2.getSession() ) );
 			}
 			else
 			{
-				int min_size = k;
+				int min = k;
 				int min_k = 0;
 				int min_j = 0;
 				bool esc = false;
 				for(int j=0; j<t; j++)
 				{
-					for(int k=0; k<p; k++)
+					for(int k=0; k<par; k++)
 					{
 						if(schedule[j][k].size() == 0)
 						{
@@ -166,7 +167,7 @@ void SessionOrganizer::initialiseSensible ( )
 						}
 						else if (schedule[j][k].size() < min)
 						{
-							min = schedule[j][k];
+							min = schedule[j][k].size();
 							min_j = j;
 							min_k = k;
 						}
@@ -184,20 +185,20 @@ void SessionOrganizer::initialiseSensible ( )
 		else if(!p2)
 		{
 			//insert p2
-			if(schedule[p1.getSession()][p1.getTrack()].size() < k)
+			if(schedule[paper1.getSession()][paper1.getTrack()].size() < k)
 			{
-				schedule[p1.getSession()][p1.getTrack()].push_back(p[i].getFirstPaper());
-				visited_paper.push_back( Paper1( p[i].getFirstPaper(), p1.getTrack(), p1.getSession() ) );
+				schedule[paper1.getSession()][paper1.getTrack()].push_back(p[i].getFirstPaper());
+				visited_paper.push_back( Paper1( p[i].getFirstPaper(), paper1.getTrack(), paper1.getSession() ) );
 			}
 			else
 			{
-				int min_size = k;
+				int min = k;
 				int min_k = 0;
 				int min_j = 0;
 				bool esc = false;
 				for(int j=0; j<t; j++)
 				{
-					for(int k=0; k<p; k++)
+					for(int k=0; k<par; k++)
 					{
 						if(schedule[j][k].size() == 0)
 						{
@@ -208,7 +209,7 @@ void SessionOrganizer::initialiseSensible ( )
 						}
 						else if (schedule[j][k].size() < min)
 						{
-							min = schedule[j][k];
+							min = schedule[j][k].size();
 							min_j = j;
 							min_k = k;
 						}
@@ -226,9 +227,10 @@ void SessionOrganizer::initialiseSensible ( )
 	}
 
 	//entering the schedule in the main datastructure
+
 	for(int i=0; i<t; i++)
 	{
-		for(int j=0; j<p; j++)
+		for(int j=0; j<par; j++)
 		{
 			vector<int> temp_schedule = schedule[i][j];
 			for(int k=0; k<temp_schedule.size(); k++)

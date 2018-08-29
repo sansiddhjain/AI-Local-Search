@@ -8,6 +8,11 @@ using namespace std;
 
 #include "Paper.h"
 
+Paper::Paper()
+{
+
+}
+
 Paper::Paper(int s, int p1, int paper2)
 {
 	this->sim = s;

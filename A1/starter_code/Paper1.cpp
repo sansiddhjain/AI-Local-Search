@@ -8,6 +8,11 @@ using namespace std;
 
 #include "Paper1.h"
 
+Paper1::Paper1()
+{
+
+}
+
 Paper1::Paper1(int i, int t, int s)
 {
 	this->id = i;
