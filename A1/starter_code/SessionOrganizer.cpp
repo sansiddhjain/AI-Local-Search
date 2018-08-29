@@ -103,7 +103,7 @@ void SessionOrganizer::initialiseSensible ( )
 		Paper1 paper2;
 
 		//checking if the paper have already been visited
-		for(int id=0; id<visited_paper.size(); i++)
+		for(int id=0; id<visited_paper.size(); id++)
 		{
 			if(visited_paper[id].getPaperID() == p[i].getFirstPaper() )
 			{
