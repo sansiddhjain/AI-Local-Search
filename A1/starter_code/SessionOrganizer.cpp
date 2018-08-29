@@ -46,6 +46,77 @@ void SessionOrganizer::initialiseRandom ( )
 	}
 }
 
+void SessionOrganizer::initialiseGreedySensible ( )
+{
+	int t = conference->getSessionsInTrack();
+	int par = conference->getParallelTracks();
+	int k_conf = conference->getPapersInSession();
+	int n = k_conf*par*t;
+
+	vector<int> visited;
+	vector<int> schedule[t][par];
+
+	for(int i=0; i<t; i++)
+	{
+		for(int j=0; j<par; j++)
+		{
+			//selecting a random unvisited paper for the slot seed
+			srand(time(NULL));
+
+			int temp_n = rand() % n;
+			while( find(visited.begin(), visited.end(), temp_n)  != visited.end())
+				temp_n = rand() % n;
+
+			//the paper has been added to the slot and visited
+			visited.push_back(temp_n);
+			schedule[i][j].push_back(temp_n);
+
+			while(schedule[i][j].size() < k_conf)
+			{
+				//expand the size of the slot by 1 paper
+				double max_sim = 1.1;
+				int max_paper = -1;
+				for(int k=0; k<n; k++)
+				{
+					if(find(visited.begin(), visited.end(), k) != visited.end())
+					{
+						continue;
+					}
+					vector<int> temp_sch = schedule[i][j];
+					for(int l=0; l<temp_sch.size(); l++)
+					{
+						int m = temp_sch[l];
+						double sim_value = distanceMatrix[m][k];
+						if( sim_value < max_sim )
+						{
+							max_sim = sim_value;
+							max_paper = k;
+						}
+					}
+				}
+
+				//adding the max_paper to the slot and visited paper vector
+				visited.push_back(max_paper);
+				schedule[i][j].push_back(max_paper);
+			}
+		}
+	}
+
+	//adding the schedule to the original datastructure
+	for(int i=0; i<t; i++)
+	{
+		for(int j=0; j<par; j++)
+		{
+			vector<int> temp_schedule = schedule[i][j];
+			// cout<<temp_schedule.size()<<endl;
+			for(int k=0; k<temp_schedule.size(); k++)
+			{
+				conference->setPaper ( j, i, k, temp_schedule[k] );
+			}
+		}
+	}
+}
+
 void SessionOrganizer::initialiseSensible ( )
 {
 	vector<Paper> p;
@@ -57,7 +128,7 @@ void SessionOrganizer::initialiseSensible ( )
 	{
 		for (int j=i+1; j<n; j++)
 		{
-			Paper paper (distanceMatrix[i][j], i, j);
+			Paper paper (1.0-distanceMatrix[i][j], i, j);
 			p.push_back(paper);
 			// cout<<distanceMatrix[i][j] << " " <<paper.getSimilarity()<<endl;
 		}
