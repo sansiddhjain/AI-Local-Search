@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
+#include <chrono>
 
 #include "SessionOrganizer.h"
 #include "Util.h"
@@ -124,7 +125,7 @@ void SessionOrganizer::initialiseSensible ( )
 
 		//trying some heuristic
 		// if(i > 30000)
-		// {	
+		// {
 		// 	p1 = false;
 		// 	p2 = false;
 		// }
@@ -274,113 +275,208 @@ void SessionOrganizer::initialiseSensible ( )
 	}
 }
 
-void SessionOrganizer::hillClimbing ( )
+void SessionOrganizer::hillClimbing (time_t startTime, char* output_filename )
 {
-	int t = conference->getSessionsInTrack();
-	int p = conference->getParallelTracks();
-	int k = conference->getPapersInSession();
-	int n = k*p*t;
+  time_t currTime = time(NULL);
+  double elapsedTime = difftime(currTime, startTime);
+  while (elapsedTime < processingTimeInMinutes*60)
+  {
+    int t = conference->getSessionsInTrack();
+    int p = conference->getParallelTracks();
+    int k = conference->getPapersInSession();
+    int n = k*p*t;
 
-	srand(time(NULL));
+    srand(time(NULL));
 
-	bool localOptima = false;
-	int loopCounter = 0;
-	int p1_p, p1_t, p1_k;
-	double score, maxScore;
-	int p_opt, t_opt, k_opt;
+    bool localOptima = false;
+    int loopCounter = 0;
+    int p1_p, p1_t, p1_k;
+    double score, maxScore;
+    int p_opt, t_opt, k_opt;
 
-	while (!localOptima)
-	{
-	  p1_p = rand() % p;
-	  p1_t = rand() % t;
-	  p1_k = rand() % k;
-	  maxScore = scoreOrganization();
-	  // cout << "loop bp" << '\n';
-	  if (loopCounter % 2 == 0)
-	  {
-		// cout << "if" << '\n';
-		for (int p2_p = 0; p2_p < p; p2_p++)
-		{
-		  if (p2_p != p1_p)
-		  {
-			for (int p2_k = 0; p2_k < k; p2_k++)
-			{
-			  conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p1_t, p2_k);
-			  score = scoreOrganization();
-			  conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p1_t, p2_k);
-			  if (score > maxScore)
-			  {
-				maxScore = score;
-				p_opt = p2_p; t_opt = p1_t; k_opt = p2_k;
-			  }
-			}
-		  }
-		}
-	  }
-	  else
-	  {
-		// cout << "else" << '\n';
-		for (int p2_t = 0; p2_t < p; p2_t++)
-		{
-		  // cout << "outer for" << '\n';
-		  if (p2_t != p1_t)
-		  {
-			for (int p2_k = 0; p2_k < k; p2_k++)
-			{
-			  // cout << "inner for" << '\n';
-			  conference->swapPapers(p1_p, p1_t, p1_k, p1_p, p2_t, p2_k);
-			  // cout << "first swap" << '\n';
-			  score = scoreOrganization();
-			  // cout << "scoring" << '\n';
-			  conference->swapPapers(p1_p, p1_t, p1_k, p1_p, p2_t, p2_k);
-			  // cout << "after swapping papers" << '\n';
-			  if (score > maxScore)
-			  {
-				maxScore = score;
-				p_opt = p1_p; t_opt = p2_t; k_opt = p2_k;
-			  }
-			}
-		  }
-		}
-	  }
-	  if (maxScore == scoreOrganization())
-	  {
-		for (int p2_p = 0; p2_p < p; p2_p++)
-		{
-		  if (p2_p != p1_p)
-		  {
-			for (int p2_t = 0; p2_t < t; p2_t++)
-			{
-			  if (p2_t != p1_t)
-			  {
-				for (int p2_k = 0; p2_k < k; p2_k++)
-				{
-				  conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p2_t, p2_k);
-				  score = scoreOrganization();
-				  conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p2_t, p2_k);
-				  if (score > maxScore)
-				  {
-					maxScore = score;
-					p_opt = p2_p; t_opt = p2_t; k_opt = p2_k;
-				  }
-				}
-			  }
-			}
-		  }
-		}
-		if (maxScore == scoreOrganization())
-		  localOptima = true;
-		else
-		  conference->swapPapers(p1_p, p1_t, p1_k, p_opt, t_opt, k_opt);
-	  }
-	  else
-		conference->swapPapers(p1_p, p1_t, p1_k, p_opt, t_opt, k_opt);
-	  loopCounter++;
-	  cout << loopCounter << '\n';
-	  cout << scoreOrganization() << '\n';
-	}
+    while ((!localOptima) & (elapsedTime < processingTimeInMinutes*60))
+    {
+      p1_p = rand() % p;
+      p1_t = rand() % t;
+      p1_k = rand() % k;
+      maxScore = scoreOrganization();
+      // cout << "loop bp" << '\n';
+      if (loopCounter % 2 == 0)
+      {
+        // cout << "if" << '\n';
+        for (int p2_p = 0; p2_p < p; p2_p++)
+        {
+          if (p2_p != p1_p)
+          {
+            for (int p2_k = 0; p2_k < k; p2_k++)
+            {
+            conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p1_t, p2_k);
+            score = scoreOrganization();
+            conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p1_t, p2_k);
+            if (score > maxScore)
+            {
+              maxScore = score;
+              p_opt = p2_p; t_opt = p1_t; k_opt = p2_k;
+            }
+          }
+          }
+        }
+      }
+      else
+      {
+        // cout << "else" << '\n';
+        for (int p2_t = 0; p2_t < p; p2_t++)
+        {
+          // cout << "outer for" << '\n';
+          if (p2_t != p1_t)
+          {
+            for (int p2_k = 0; p2_k < k; p2_k++)
+            {
+              // cout << "inner for" << '\n';
+              conference->swapPapers(p1_p, p1_t, p1_k, p1_p, p2_t, p2_k);
+              // cout << "first swap" << '\n';
+              score = scoreOrganization();
+              // cout << "scoring" << '\n';
+              conference->swapPapers(p1_p, p1_t, p1_k, p1_p, p2_t, p2_k);
+              // cout << "after swapping papers" << '\n';
+              if (score > maxScore)
+              {
+                maxScore = score;
+                p_opt = p1_p; t_opt = p2_t; k_opt = p2_k;
+              }
+            }
+          }
+        }
+      }
+      if (maxScore == scoreOrganization())
+      {
+        for (int p2_p = 0; p2_p < p; p2_p++)
+        {
+          if (p2_p != p1_p)
+          {
+            for (int p2_t = 0; p2_t < t; p2_t++)
+            {
+              if (p2_t != p1_t)
+              {
+                for (int p2_k = 0; p2_k < k; p2_k++)
+                {
+                  conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p2_t, p2_k);
+                  score = scoreOrganization();
+                  conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p2_t, p2_k);
+                  if (score > maxScore)
+                  {
+                    maxScore = score;
+                    p_opt = p2_p; t_opt = p2_t; k_opt = p2_k;
+                  }
+                }
+              }
+            }
+          }
+        }
+        if (maxScore == scoreOrganization())
+          localOptima = true;
+        else
+          conference->swapPapers(p1_p, p1_t, p1_k, p_opt, t_opt, k_opt);
+      }
+      else
+        conference->swapPapers(p1_p, p1_t, p1_k, p_opt, t_opt, k_opt);
+      loopCounter++;
+      cout << loopCounter << '\n';
+      cout << scoreOrganization() << '\n';
+      printSessionOrganiser( output_filename);
+      currTime = time(NULL);
+      elapsedTime = difftime(currTime, startTime);
+    }
+  }
 }
 
+void SessionOrganizer::hillClimbing1 (time_t startTime, char* output_filename )
+{
+  time_t currTime = time(NULL);
+  double elapsedTime = difftime(currTime, startTime);
+  while (elapsedTime < processingTimeInMinutes*60)
+  {
+    int t = conference->getSessionsInTrack();
+    int p = conference->getParallelTracks();
+    int k = conference->getPapersInSession();
+    int n = k*p*t;
+
+    srand(time(NULL));
+
+    bool localOptima = false;
+    int loopCounter = 0;
+    int p1_p, p1_t, p1_k;
+    double score, maxScore;
+    int p_opt, t_opt, k_opt;
+
+    while ((!localOptima) & (elapsedTime < processingTimeInMinutes*60))
+    {
+      p1_p = rand() % p;
+      p1_t = rand() % t;
+      p1_k = rand() % k;
+      maxScore = scoreOrganization();
+      // cout << "loop bp" << '\n';
+      if (loopCounter % 2 == 0)
+      {
+        // cout << "if" << '\n';
+        for (int p2_p = 0; p2_p < p; p2_p++)
+        {
+          if (p2_p != p1_p)
+          {
+            for (int p2_k = 0; p2_k < k; p2_k++)
+            {
+            conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p1_t, p2_k);
+            score = scoreOrganization();
+            conference->swapPapers(p1_p, p1_t, p1_k, p2_p, p1_t, p2_k);
+            if (score > maxScore)
+            {
+              maxScore = score;
+              p_opt = p2_p; t_opt = p1_t; k_opt = p2_k;
+            }
+          }
+          }
+        }
+      }
+      else
+      {
+        // cout << "else" << '\n';
+        for (int p2_t = 0; p2_t < p; p2_t++)
+        {
+          // cout << "outer for" << '\n';
+          if (p2_t != p1_t)
+          {
+            for (int p2_k = 0; p2_k < k; p2_k++)
+            {
+              // cout << "inner for" << '\n';
+              conference->swapPapers(p1_p, p1_t, p1_k, p1_p, p2_t, p2_k);
+              // cout << "first swap" << '\n';
+              score = scoreOrganization();
+              // cout << "scoring" << '\n';
+              conference->swapPapers(p1_p, p1_t, p1_k, p1_p, p2_t, p2_k);
+              // cout << "after swapping papers" << '\n';
+              if (score > maxScore)
+              {
+                maxScore = score;
+                p_opt = p1_p; t_opt = p2_t; k_opt = p2_k;
+              }
+            }
+          }
+        }
+      }
+      if (maxScore == scoreOrganization())
+        localOptima = true;
+      else
+        conference->swapPapers(p1_p, p1_t, p1_k, p_opt, t_opt, k_opt);
+      loopCounter++;
+      cout << loopCounter << '\n';
+      cout << scoreOrganization() << '\n';
+      if (loopCounter % 5 == 0)
+        printSessionOrganiser( output_filename);
+      currTime = time(NULL);
+      elapsedTime = difftime(currTime, startTime);
+    }
+  }
+}
 
 void SessionOrganizer::readInInputFile ( string filename )
 {

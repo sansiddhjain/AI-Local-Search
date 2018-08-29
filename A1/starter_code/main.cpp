@@ -67,6 +67,7 @@ void createInputFile(int p, int t, int k, char* filename)
  */
 int main ( int argc, char** argv )
 {
+    time_t startTime = time(NULL);
 		// Parse the input.
 		if ( argc < 3 )
 		{
@@ -87,15 +88,15 @@ int main ( int argc, char** argv )
 		SessionOrganizer *organizer  = new SessionOrganizer( inputfilename );
 		// cout << "yay" << '\n';
 		// Organize the papers into tracks based on similarity.
-		// organizer->initialiseRandom ( );
+		organizer->initialiseRandom ( );
 		// cout<< "entering initialiseSensible" << '\n';
-		organizer->initialiseSensible ( );
+		// organizer->initialiseSensible ( );
 		cout << "yay" << '\n';
-		organizer->hillClimbing ( );
-		organizer->hillClimbing ( );
-		organizer->hillClimbing ( );
-		organizer->hillClimbing ( );
-		organizer->hillClimbing ( );
+		organizer->hillClimbing1 (startTime, argv[2]);
+		// organizer->hillClimbing ( );
+		// organizer->hillClimbing ( );
+		// organizer->hillClimbing ( );
+		// organizer->hillClimbing ( );
 
 		organizer->printSessionOrganiser ( argv[2]);
 
