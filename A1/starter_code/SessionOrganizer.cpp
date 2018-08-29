@@ -50,8 +50,8 @@ void SessionOrganizer::initialiseSensible ( )
 	vector<Paper> p;
 	int t = conference->getSessionsInTrack();
 	int par = conference->getParallelTracks();
-	int k = conference->getPapersInSession();
-	int n = k*par*t;
+	int k_conf = conference->getPapersInSession();
+	int n = k_conf*par*t;
 	for (int i=0; i<n; i++)
 	{
 		for (int j=i+1; j<n; j++)
@@ -70,7 +70,7 @@ void SessionOrganizer::initialiseSensible ( )
 
 	sort(p.begin(), p.end(), [](Paper & one, Paper & two){return one.getSimilarity() > two.getSimilarity();});
 
-	//printing the sorted vector
+	// printing the sorted vector
 	// for(int i=0; i<p.size(); i++)
 	// {
 	// 	cout<<p[i].getFirstPaper()<<" "<<p[i].getSecondPaper()<<" "<<p[i].getSimilarity()<<endl;
@@ -137,13 +137,13 @@ void SessionOrganizer::initialiseSensible ( )
 		{
 			//insert both p1 and p2 in a new track
 			//search for the element with the lowest size in the matrix
-			int min = k-1;
+			int min = k_conf;
 			int min_k = 0;
 			int min_j = 0;
 			bool esc = false;
-			for(int j=0; j<t; j++)
+			for(int k=0; k<par; k++)
 			{
-				for(int k=0; k<par; k++)
+				for(int j=0; j<t; j++)
 				{
 					if(schedule[j][k].size() == 0)
 					{
@@ -166,30 +166,55 @@ void SessionOrganizer::initialiseSensible ( )
 			}
 			if(!esc)
 			{
-				schedule[min_j][min_k].push_back(p[i].getFirstPaper());
-				schedule[min_j][min_k].push_back(p[i].getSecondPaper());
-				visited_paper.push_back( Paper1( p[i].getFirstPaper(), min_k, min_j ) );
-				visited_paper.push_back( Paper1( p[i].getSecondPaper(), min_k, min_j ) );
+				if(min != (k_conf-1))
+				{
+					schedule[min_j][min_k].push_back(p[i].getFirstPaper());
+					schedule[min_j][min_k].push_back(p[i].getSecondPaper());
+					visited_paper.push_back( Paper1( p[i].getFirstPaper(), min_k, min_j ) );
+					visited_paper.push_back( Paper1( p[i].getSecondPaper(), min_k, min_j ) );	
+				}
+				else
+				{
+					schedule[min_j][min_k].push_back(p[i].getFirstPaper());
+					visited_paper.push_back( Paper1( p[i].getFirstPaper(), min_k, min_j ) );
+
+					bool esc1 = false;
+					for(int k=0; k<par; k++)
+					{
+						for(int j=0; j<t; j++)
+						{
+							if(schedule[j][k].size()<k_conf)
+							{
+								schedule[j][k].push_back(p[i].getSecondPaper());	
+								visited_paper.push_back( Paper1( p[i].getSecondPaper(), k, j ) );
+								esc1 = true;
+								break;
+							}
+						}
+						if(esc1)
+							break;
+					}
+				}
 			}
 
 		}
 		else if(!p1)
 		{
 			//insert p1
-			if(schedule[paper2.getSession()][paper2.getTrack()].size() < k)
+			if(schedule[paper2.getSession()][paper2.getTrack()].size() < k_conf)
 			{
 				schedule[paper2.getSession()][paper2.getTrack()].push_back(p[i].getFirstPaper());
 				visited_paper.push_back( Paper1( p[i].getFirstPaper(), paper2.getTrack(), paper2.getSession() ) );
 			}
 			else
 			{
-				int min = k;
+				int min = k_conf;
 				int min_k = 0;
 				int min_j = 0;
 				bool esc = false;
-				for(int j=0; j<t; j++)
+				for(int k=0; k<par; k++)
 				{
-					for(int k=0; k<par; k++)
+					for(int j=0; j<t; j++)
 					{
 						if(schedule[j][k].size() == 0)
 						{
@@ -218,20 +243,20 @@ void SessionOrganizer::initialiseSensible ( )
 		else if(!p2)
 		{
 			//insert p2
-			if(schedule[paper1.getSession()][paper1.getTrack()].size() < k)
+			if(schedule[paper1.getSession()][paper1.getTrack()].size() < k_conf)
 			{
 				schedule[paper1.getSession()][paper1.getTrack()].push_back(p[i].getFirstPaper());
 				visited_paper.push_back( Paper1( p[i].getFirstPaper(), paper1.getTrack(), paper1.getSession() ) );
 			}
 			else
 			{
-				int min = k;
+				int min = k_conf;
 				int min_k = 0;
 				int min_j = 0;
 				bool esc = false;
-				for(int j=0; j<t; j++)
+				for(int k=0; k<par; k++)
 				{
-					for(int k=0; k<par; k++)
+					for(int j=0; j<t; j++)
 					{
 						if(schedule[j][k].size() == 0)
 						{
@@ -260,7 +285,15 @@ void SessionOrganizer::initialiseSensible ( )
 	}
 
 	//entering the schedule in the main datastructure
+	vector<int> inserted_paper;
+	vector<int> domain;
 
+	for(int i=0; i<n; i++)
+	{
+		domain.push_back(i);
+	}
+
+	//removing redundant paper and adding if less
 	for(int i=0; i<t; i++)
 	{
 		for(int j=0; j<par; j++)
@@ -268,9 +301,52 @@ void SessionOrganizer::initialiseSensible ( )
 			vector<int> temp_schedule = schedule[i][j];
 			for(int k=0; k<temp_schedule.size(); k++)
 			{
-				conference->setPaper ( j, i, k, temp_schedule[k] );
+				if(find(inserted_paper.begin(), inserted_paper.end(), temp_schedule[k]) != inserted_paper.end() )
+				{
+					int rem = temp_schedule[k];
+					temp_schedule.erase(remove(temp_schedule.begin(), temp_schedule.end(), rem), temp_schedule.end());
+					k--;
+				}
+				else
+				{
+					int rem = temp_schedule[k];
+					domain.erase(remove(domain.begin(), domain.end(), rem), domain.end());
+				}
+			}
+			if(temp_schedule.size() < k_conf)
+			{
+				while(temp_schedule.size() < k_conf)
+				{
+					int add_element = domain[0];
+					domain.erase(domain.begin());
+					temp_schedule.push_back(add_element);
+				}
+			}
+			schedule[i][j] = temp_schedule;
+		}
+	}
+
+	for(int i=0; i<t; i++)
+	{
+		for(int j=0; j<par; j++)
+		{
+			vector<int> temp_schedule = schedule[i][j];
+			// cout<<temp_schedule.size()<<endl;
+			for(int k=0; k<temp_schedule.size(); k++)
+			{
+				inserted_paper.push_back(temp_schedule[k]);
+				conference->setPaper ( j, i, k, temp_schedule[k] );		
 			}
 		}
+	}
+
+
+
+	cout<<inserted_paper.size()<<endl;
+	sort(inserted_paper.begin(), inserted_paper.end());
+	for(int i=0; i<inserted_paper.size(); i++)
+	{
+		cout<<"#"<<inserted_paper[i]<<endl;
 	}
 }
 
