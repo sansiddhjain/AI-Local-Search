@@ -430,6 +430,90 @@ void SessionOrganizer::initialiseSensible ( )
 	// }
 }
 
+int findMostSimPaper(double** simMatrix, int n)
+{
+	int max_idx = 0;
+	for (int i = 1; i < n; i++)
+	{
+		if (simMatrix[n][i] > simMatrix[n][max_idx])
+			max_idx = i;
+	}
+	simMatrix[n][max_idx] = 0;
+	return max_idx;
+}
+
+void SessionOrganizer::initialiseSensible1 ( )
+{
+	int t = conference->getSessionsInTrack();
+	int p = conference->getParallelTracks();
+	int k = conference->getPapersInSession();
+	int n = k*p*t;
+
+	double** simMatrix = new double*[n];
+	for (int i = 0; i < n; i++)
+		simMatrix[i] = new double[n];
+
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+			simMatrix[i][j] = 1-distanceMatrix[i][j];
+	}
+
+	// int** schedule = new int*[t];
+	// for (int i = 0; i < t; i++)
+	// 	schedule[i] = new int[k*p];
+
+	vector<int> schedule[t][p];
+	// for (int i = 0; i < n; i++)
+	// 	schedule[i] = -1;
+
+	schedule[0][0].push_back(0);
+	int i = 0;
+	int counter = 0;
+	while (counter <= n-1)
+	{
+		int t_idx = i / (k*p);
+		int p_idx = (i % (k*p)) / k;
+		int k_idx = (i % (k*p)) % k;
+		int paper_id = schedule[t_idx][p_idx].at(k_idx);
+		int sim_paper = findMostSimPaper(simMatrix, paper_id);
+		if (k_idx == k-1)
+		{
+			if (t_idx == t-1)
+			{
+				schedule[0][p_idx+1].push_back(sim_paper);
+				i = (p_idx+1)*k+schedule[0][p_idx].size()-1;
+			}
+			else
+			{
+				schedule[t_idx+1][p_idx].push_back(sim_paper);
+				i = (t_idx+1)*(k*p)+p_idx*k+schedule[t_idx+1][p_idx].size()-1;
+			}
+		}
+		else
+		{
+			schedule[t_idx][p_idx].push_back(sim_paper);
+			i++;
+		}
+		counter++;
+	}
+
+	vector<int> inserted_paper;
+	for(int id=0; id<t; id++)
+	{
+		for(int j=0; j<p; j++)
+		{
+			vector<int> temp_schedule = schedule[id][j];
+			for(int kd=0; kd<temp_schedule.size(); kd++)
+			{
+				inserted_paper.push_back(temp_schedule[kd]);
+				conference->setPaper ( j, id, kd, temp_schedule[kd] );
+			}
+		}
+	}
+}
+
+
 void SessionOrganizer::hillClimbing (time_t startTime, char* output_filename )
 {
   time_t currTime = time(NULL);

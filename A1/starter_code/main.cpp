@@ -88,11 +88,23 @@ int main ( int argc, char** argv )
 		SessionOrganizer *organizer  = new SessionOrganizer( inputfilename );
 		// cout << "yay" << '\n';
 		// Organize the papers into tracks based on similarity.
+    if (organizer->processingTimeInMinutes<=0.6)
+    {
+      organizer->initialiseRandom ( );
+    }
+    else if(organizer->processingTimeInMinutes>=1.5)
+    {
+      organizer->initialiseSensible ( );
+    }
+    else
+    {
+      organizer->initialiseGreedySensible ( );
+    }
 		// organizer->initialiseRandom ( );
-		// cout<< "entering initialiseSensible" << '\n';
 		// organizer->initialiseSensible ( );
-		organizer->initialiseGreedySensible ( );
-		cout << "yay" << '\n';
+		// organizer->initialiseGreedySensible ( );
+		// // organizer->initialiseSensible1( );
+		// cout << "yay" << '\n';
 		organizer->hillClimbing (startTime, argv[2]);
 		// organizer->hillClimbing ( );
 		// organizer->hillClimbing ( );
