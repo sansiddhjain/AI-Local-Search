@@ -36,7 +36,9 @@ void Track::setPaper ( int sessionIndex, int paperIndex, int paperId )
 int Track::getPaper(int t, int k)
 {
   Session ss = sessions[t];
+  // cout << "got session" << '\n';
   return ss.getPaper(k);
+  // cout << "post return statement of Track" << '\n';
 }
 
 int Track::getNumberOfSessions ( )

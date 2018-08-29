@@ -52,8 +52,12 @@ void createInputFile(int p, int t, int k, char* filename)
   for ( int i = 0; i < n; i++ )
   {
       for ( int j = 0; j < n; j++ )
+      {
+        if (j == n-1)
+          ofile << mat[i][j] << "\n";
+        else
           ofile << mat[i][j] << " ";
-      ofile<<"\n";
+      }
   }
   ofile.close();
 }
@@ -74,16 +78,21 @@ int main ( int argc, char** argv )
     string inputfilename ( argv[1] );
     // char *inp = inputfilename.c_str();
 
-    int k = stoi(argv[3]);
-    int p = stoi(argv[4]);
-    int t = stoi(argv[5]);
-    createInputFile(p, t, k, argv[1]);
+    // int k = stoi(argv[3]);
+    // int p = stoi(argv[4]);
+    // int t = stoi(argv[5]);
+    // createInputFile(p, t, k, argv[1]);
 
     // Initialize the conference organizer.
     SessionOrganizer *organizer  = new SessionOrganizer( inputfilename );
-
+    // cout << "yay" << '\n';
     // Organize the papers into tracks based on similarity.
     organizer->initialiseRandom ( );
+    // cout << "yay" << '\n';
+    organizer->hillClimbing ( );
+    organizer->hillClimbing ( );
+    organizer->hillClimbing ( );
+    organizer->hillClimbing ( );
     organizer->hillClimbing ( );
 
     organizer->printSessionOrganiser ( argv[2]);

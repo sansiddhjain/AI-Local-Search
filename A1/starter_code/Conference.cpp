@@ -53,16 +53,25 @@ int Conference::getPapersInSession ( )
 
 int Conference::getPaper(int p, int t, int k)
 {
+  if (p >= parallelTracks) {
+    // cout << "error - p > parallelTracks" << '\n';
+  }
   Track tr = tracks[p];
+  // cout << "got track" << '\n';
   return tr.getPaper(t, k);
+  // cout << "post return statement" << '\n';
 }
 
 void Conference::swapPapers(int p1, int t1, int k1, int p2, int t2, int k2)
 {
   int paper1 = getPaper(p1, t1, k1);
+  // cout << "got paper 1" << '\n';
   int paper2 = getPaper(p2, t2, k2);
+  // cout << "got paper 2" << '\n';
   setPaper(p1, t1, k1, paper2);
+  // cout << "setting paper 2 to paper 1's slot" << '\n';
   setPaper(p2, t2, k2, paper1);
+  // cout << "setting paper 1 to paper 2's slot" << '\n';
 }
 
 Track Conference::getTrack ( int index )

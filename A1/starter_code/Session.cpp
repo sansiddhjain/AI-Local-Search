@@ -1,7 +1,7 @@
-/* 
+/*
  * File:   Session.cpp
  * Author: Kapil Thakkar
- * 
+ *
  */
 
 #include <errno.h>
@@ -38,6 +38,12 @@ int Session::getPaper ( int index )
 {
     if ( index < papersInSession )
     {
+        // std::cout << "entered into getPaper function of Session" << '\n';
+        // std::cout << index << '\n';
+        // for (int i = papersInSession; i > 0; i--) {
+        //   std::cout << papers[i-1] << '\n';
+        // }
+        // std::cout << papers[index] << '\n';
         return papers[index];
     }
     else
